@@ -1,7 +1,7 @@
 # ETHEREUM HISTORY DOWNLOADER
 ## download an ETHEREUM account's balance history
 
-[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)]
+[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)]()
 
 ### Requirments
 - docker (https://docs.docker.com/engine/install/)
