@@ -1,5 +1,5 @@
-# TRON HISTORY DOWNLOADER
-## download an TRON account's balance history
+# ETHEREUM HISTORY DOWNLOADER
+## download an ETHEREUM account's balance history
 
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
@@ -10,7 +10,11 @@
 
 ### Usage
 
-- To start the download run `yarn start <accountname>`. This will beging the download into the local postgres database. once the download is complete you can use a tool like tablePlus, psql, dbeaver to connect to the db at localhost:5432.
+- To start the download first create a file in the backend directory called address.csv that looks like this:
 
-### Notes
-- New tron blocks are published on average every 3 seconds. The downloader makes the rather naive assumption that each day will contain 28800 ledgers which is not always the case. if you need you more fine grain balance data you can decrease this value to whatever you want.
+```
+address,created_at
+0x178b91ea3088264c2eebb7f91b3a8425b0a34ee5,2018-10-11 15:40:48.19
+etc... 
+```
+then run `yarn start` and the script will begin querying the balance for each account in addresses file on dec 31 of each year since 2018.
