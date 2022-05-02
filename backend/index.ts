@@ -4,8 +4,14 @@ import _ from "lodash";
 import path from "path";
 import { getKnex, parseCsv, post, uuid } from "./lib";
 
-const API_BASE_URL =
-  "https://api.archivenode.io/5c26c0e0-0f1a-435e-86ce-3ac4c0df88e2";
+const loadConf = () => {
+  const conf = JSON.parse(fs.readFileSync("./conf.json", "utf-8"));
+  return conf;
+};
+
+const conf = loadConf();
+
+const API_BASE_URL = `https://api.archivenode.io/${conf.apikey}`;
 
 // blocks from dec 31 of each year
 const _2018 = [2018, 6982693];
@@ -17,7 +23,7 @@ const years = [_2018, _2019, _2020, _2021];
 
 const getAccountInfoAtBlock = async (account: string, block: number) => {
   console.log({ account, block });
-  const accountBalalance = await post(`${API_BASE_URL}`, {
+  const accountBalalance = await post(`${API_BASE_URL()}`, {
     jsonrpc: "2.0",
     method: "eth_getBalance",
     params: [account, block],
@@ -30,7 +36,7 @@ const getAccountInfoAtBlock = async (account: string, block: number) => {
 };
 
 export const insertBalanceRow = async (accountInfo: any) => {
-  const knex = await getKnex();
+  const knex = await getKnex("tron");
   await knex("balance").insert({
     id: uuid(),
     date: accountInfo.date,
@@ -42,7 +48,7 @@ export const insertBalanceRow = async (accountInfo: any) => {
 };
 
 // const getNextBalance = async () => {
-//   const knex = await getKnex();
+//   const knex = await getKnex("tron");
 
 //   const [previousRecord] = await knex("balance")
 //     .orderBy("date", "desc")
@@ -72,7 +78,7 @@ const ADDRESS_FILE = "address.csv";
 
 const loadAddresses = async () => {
   console.log("loading addresses");
-  const knex = await getKnex();
+  const knex = await getKnex("tron");
   const csvStr = fs.readFileSync(path.join(__dirname, ADDRESS_FILE), "utf-8");
   const csvRows = parseCsv(csvStr);
   await knex("account")
@@ -88,8 +94,7 @@ const loadAddresses = async () => {
 };
 
 const start = async () => {
-  console.log("here");
-  const knex = await getKnex();
+  const knex = await getKnex("tron");
   const [, , load = true] = process.argv;
 
   if (load) {

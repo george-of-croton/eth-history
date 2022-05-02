@@ -122,12 +122,14 @@ export const replaceAll = (
   return nextString;
 };
 
-export const once = <T>(fn: () => T) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const once = <T>(fn: (...args: any[]) => T) => {
   let exec = false;
   let result: T;
-  return () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (...args: any[]) => {
     if (!exec) {
-      result = fn();
+      result = fn(...args);
       exec = true;
     }
     return result;
@@ -139,7 +141,7 @@ export const wait = async (timeout: number) =>
     setTimeout(resolve, timeout);
   });
 
-export const getKnex = once(async () => {
+export const getKnex = once(async (database = "postgres") => {
   const client = knex({
     client: "pg", // or 'better-sqlite3'
     connection: {
@@ -147,7 +149,7 @@ export const getKnex = once(async () => {
       port: 5432,
       user: "postgres",
       password: "password",
-      database: "postgres",
+      database,
     },
   });
 

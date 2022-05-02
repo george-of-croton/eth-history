@@ -9,6 +9,6 @@ test("fetches account transactions", async () => {
 });
 
 afterAll(async () => {
-  const knex = await getKnex();
+  const knex = await getKnex("tron");
   await knex.destroy();
 });
