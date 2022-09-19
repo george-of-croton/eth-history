@@ -23,7 +23,7 @@ const years = [_2018, _2019, _2020, _2021];
 
 const getAccountInfoAtBlock = async (account: string, block: number) => {
   console.log({ account, block });
-  const accountBalalance = await post(`${API_BASE_URL()}`, {
+  const accountBalalance = await post(`${API_BASE_URL}`, {
     jsonrpc: "2.0",
     method: "eth_getBalance",
     params: [account, block],
