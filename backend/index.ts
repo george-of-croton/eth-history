@@ -3,15 +3,9 @@ import fs from "fs";
 import _ from "lodash";
 import path from "path";
 import { getKnex, logger, parseCsv, post, uuid } from "./lib";
+import * as conf from "./conf";
 
-const loadConf = () => {
-  const conf = JSON.parse(fs.readFileSync("./conf.json", "utf-8"));
-  return conf;
-};
-
-const conf = loadConf();
-
-const API_BASE_URL = `https://api.archivenode.io/${conf.apikey}`;
+const API_BASE_URL = `https://api.archivenode.io/${conf.apiKey}`;
 
 // blocks from dec 31 of each year
 const _2018 = [2018, 6982693];
