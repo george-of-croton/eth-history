@@ -2,7 +2,7 @@
 import fs from "fs";
 import _ from "lodash";
 import path from "path";
-import { getKnex, parseCsv, post, uuid } from "./lib";
+import { getKnex, logger, parseCsv, post, uuid } from "./lib";
 
 const loadConf = () => {
   const conf = JSON.parse(fs.readFileSync("./conf.json", "utf-8"));
@@ -22,7 +22,7 @@ const _2021 = [2021, 13909787];
 const years = [_2018, _2019, _2020, _2021];
 
 const getAccountInfoAtBlock = async (account: string, block: number) => {
-  console.log({ account, block });
+  logger.debug({ account, block });
   const accountBalalance = await post(`${API_BASE_URL}`, {
     jsonrpc: "2.0",
     method: "eth_getBalance",
@@ -30,7 +30,7 @@ const getAccountInfoAtBlock = async (account: string, block: number) => {
     id: 1,
   });
 
-  console.log({ accountBalalance });
+  logger.debug({ accountBalalance });
 
   return Number(accountBalalance.result);
 };
@@ -77,7 +77,7 @@ export const insertBalanceRow = async (accountInfo: any) => {
 const ADDRESS_FILE = "address.csv";
 
 const loadAddresses = async () => {
-  console.log("loading addresses");
+  logger.debug("loading addresses");
   const knex = await getKnex("tron");
   const csvStr = fs.readFileSync(path.join(__dirname, ADDRESS_FILE), "utf-8");
   const csvRows = parseCsv(csvStr);

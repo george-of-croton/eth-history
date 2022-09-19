@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { getKnex, parseCsv } from "../lib";
 
 test("fetches account transactions", async () => {
