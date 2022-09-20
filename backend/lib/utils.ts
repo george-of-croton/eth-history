@@ -3,7 +3,6 @@ import AbortController from "abort-controller";
 import fs from "fs";
 import winston from "winston";
 import path from "path";
-import knex from "knex";
 import { v4 } from "uuid";
 import { inspect } from "util";
 import { LEVEL, SPLAT } from "triple-beam";
@@ -140,21 +139,5 @@ export const wait = async (timeout: number) =>
   new Promise((resolve) => {
     setTimeout(resolve, timeout);
   });
-
-export const getKnex = once(async (database = "postgres") => {
-  const client = knex({
-    client: "pg", // or 'better-sqlite3'
-    connection: {
-      host: "postgres",
-      port: 5432,
-      user: "postgres",
-      password: "password",
-      database,
-    },
-  });
-
-  await client.migrate.latest();
-  return client;
-});
 
 export const uuid = v4;
