@@ -38,7 +38,7 @@ const ensureDatabaseExists = async (database: string) => {
 interface GetKnex {
   (database: string): Promise<Knex<any, unknown>>;
 }
-export const getKnex: GetKnex = once(async (database = "postgres") => {
+export const getKnex: GetKnex = once(async (database: string) => {
   await ensureDatabaseExists(database);
   const knex = getKnexWriter({ database });
   await knex.migrate.latest();

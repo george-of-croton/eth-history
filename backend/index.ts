@@ -3,9 +3,9 @@ import fs from "fs";
 import _ from "lodash";
 import path from "path";
 import { getKnex, logger, parseCsv, post, uuid } from "./lib";
-import * as conf from "./conf";
+import { apiKey, database } from "./conf";
 
-const API_BASE_URL = `https://api.archivenode.io/${conf.apiKey}`;
+const API_BASE_URL = `https://api.archivenode.io/${apiKey}`;
 
 // blocks from dec 31 of each year
 const _2018 = [2018, 6982693];
@@ -30,7 +30,7 @@ const getAccountInfoAtBlock = async (account: string, block: number) => {
 };
 
 export const insertBalanceRow = async (accountInfo: any) => {
-  const knex = await getKnex("tron");
+  const knex = await getKnex(database);
   await knex("balance").insert({
     id: uuid(),
     date: accountInfo.date,
@@ -42,7 +42,7 @@ export const insertBalanceRow = async (accountInfo: any) => {
 };
 
 // const getNextBalance = async () => {
-//   const knex = await getKnex("tron");
+//   const knex = await getKnex(database);
 
 //   const [previousRecord] = await knex("balance")
 //     .orderBy("date", "desc")
@@ -70,14 +70,18 @@ export const insertBalanceRow = async (accountInfo: any) => {
 
 const ADDRESS_FILE = "address.csv";
 
+const readCsvFromFile = (filename: string) => {
+  const csvStr = fs.readFileSync(path.join(__dirname, filename), "utf-8");
+  return parseCsv(csvStr);
+};
+
 const loadAddresses = async () => {
   logger.debug("loading addresses");
-  const knex = await getKnex("tron");
-  const csvStr = fs.readFileSync(path.join(__dirname, ADDRESS_FILE), "utf-8");
-  const csvRows = parseCsv(csvStr);
+  const data = readCsvFromFile(ADDRESS_FILE);
+  const knex = await getKnex(database);
   await knex("account")
     .insert(
-      csvRows.map(([address, createdAt]) => ({
+      data.map(([address, createdAt]) => ({
         id: uuid(),
         address,
         created_at: new Date(createdAt),
@@ -88,7 +92,7 @@ const loadAddresses = async () => {
 };
 
 const start = async () => {
-  const knex = await getKnex("tron");
+  const knex = await getKnex(database);
   const [, , load = true] = process.argv;
 
   if (load) {

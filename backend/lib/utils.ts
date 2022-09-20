@@ -8,7 +8,7 @@ import { inspect } from "util";
 import { LEVEL, SPLAT } from "triple-beam";
 import _ from "lodash";
 
-export const parseCsv: (csv: string) => string[] = _.flow([
+export const parseCsv: (csv: string) => string[][] = _.flow([
   // remove headings
   (data) => _.split(data, "\n"),
   (data) => _.drop(data, 1),
@@ -95,9 +95,9 @@ export const get = async (url: string, options = {}) => {
 };
 
 export const post = async (url: string, body: any, options = {}) => {
-  return JSON.parse(
-    await (await httpRequest("post")(url, { body, ...options })).text()
-  );
+  const response = await httpRequest("post")(url, { body, ...options });
+  const responseText = await response.text();
+  return JSON.parse(responseText);
 };
 
 export const download = async (url: string, filename: string, options = {}) => {
