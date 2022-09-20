@@ -117,6 +117,7 @@ const start = async () => {
 
       if (_.isEmpty(accounts)) {
         next = false;
+        logger.info("finished updating accounts");
         break;
       } else {
         // eslint-disable-next-line no-plusplus
