@@ -3,17 +3,17 @@ import AbortController from "abort-controller";
 import fs from "fs";
 import winston from "winston";
 import path from "path";
-import knex from "knex";
 import { v4 } from "uuid";
 import { inspect } from "util";
 import { LEVEL, SPLAT } from "triple-beam";
 import _ from "lodash";
 
-export const parseCsv: (csv: string) => string[] = _.flow([
+export const parseCsv: (csv: string) => string[][] = _.flow([
   // remove headings
   (data) => _.split(data, "\n"),
   (data) => _.drop(data, 1),
   (data) => _.map(data, (data) => _.split(data, ",")),
+  (data) => _.filter(data, (data) => _.negate(_.isEqual)(data, [""])), // filter out empty rows
 ]);
 
 export const logger = winston.createLogger({
@@ -96,9 +96,9 @@ export const get = async (url: string, options = {}) => {
 };
 
 export const post = async (url: string, body: any, options = {}) => {
-  return JSON.parse(
-    await (await httpRequest("post")(url, { body, ...options })).text()
-  );
+  const response = await httpRequest("post")(url, { body, ...options });
+  const responseText = await response.text();
+  return JSON.parse(responseText);
 };
 
 export const download = async (url: string, filename: string, options = {}) => {
@@ -140,21 +140,5 @@ export const wait = async (timeout: number) =>
   new Promise((resolve) => {
     setTimeout(resolve, timeout);
   });
-
-export const getKnex = once(async (database = "postgres") => {
-  const client = knex({
-    client: "pg", // or 'better-sqlite3'
-    connection: {
-      host: "postgres",
-      port: 5432,
-      user: "postgres",
-      password: "password",
-      database,
-    },
-  });
-
-  await client.migrate.latest();
-  return client;
-});
 
 export const uuid = v4;

@@ -2,16 +2,10 @@
 import fs from "fs";
 import _ from "lodash";
 import path from "path";
-import { getKnex, parseCsv, post, uuid } from "./lib";
+import { getKnex, logger, parseCsv, post, uuid } from "./lib";
+import { apiKey, database } from "./conf";
 
-const loadConf = () => {
-  const conf = JSON.parse(fs.readFileSync("./conf.json", "utf-8"));
-  return conf;
-};
-
-const conf = loadConf();
-
-const API_BASE_URL = `https://api.archivenode.io/${conf.apikey}`;
+const API_BASE_URL = `https://api.archivenode.io/${apiKey}`;
 
 // blocks from dec 31 of each year
 const _2018 = [2018, 6982693];
@@ -22,21 +16,21 @@ const _2021 = [2021, 13909787];
 const years = [_2018, _2019, _2020, _2021];
 
 const getAccountInfoAtBlock = async (account: string, block: number) => {
-  console.log({ account, block });
-  const accountBalalance = await post(`${API_BASE_URL()}`, {
+  logger.debug({ account, block });
+  const accountBalalance = await post(`${API_BASE_URL}`, {
     jsonrpc: "2.0",
     method: "eth_getBalance",
     params: [account, block],
     id: 1,
   });
 
-  console.log({ accountBalalance });
+  logger.debug({ accountBalalance });
 
   return Number(accountBalalance.result);
 };
 
 export const insertBalanceRow = async (accountInfo: any) => {
-  const knex = await getKnex("tron");
+  const knex = await getKnex(database);
   await knex("balance").insert({
     id: uuid(),
     date: accountInfo.date,
@@ -48,7 +42,7 @@ export const insertBalanceRow = async (accountInfo: any) => {
 };
 
 // const getNextBalance = async () => {
-//   const knex = await getKnex("tron");
+//   const knex = await getKnex(database);
 
 //   const [previousRecord] = await knex("balance")
 //     .orderBy("date", "desc")
@@ -76,14 +70,18 @@ export const insertBalanceRow = async (accountInfo: any) => {
 
 const ADDRESS_FILE = "address.csv";
 
+const readCsvFromFile = (filename: string) => {
+  const csvStr = fs.readFileSync(path.join(__dirname, filename), "utf-8");
+  return parseCsv(csvStr);
+};
+
 const loadAddresses = async () => {
-  console.log("loading addresses");
-  const knex = await getKnex("tron");
-  const csvStr = fs.readFileSync(path.join(__dirname, ADDRESS_FILE), "utf-8");
-  const csvRows = parseCsv(csvStr);
+  logger.debug("loading addresses");
+  const data = readCsvFromFile(ADDRESS_FILE);
+  const knex = await getKnex(database);
   await knex("account")
     .insert(
-      csvRows.map(([address, createdAt]) => ({
+      data.map(([address, createdAt]) => ({
         id: uuid(),
         address,
         created_at: new Date(createdAt),
@@ -94,7 +92,7 @@ const loadAddresses = async () => {
 };
 
 const start = async () => {
-  const knex = await getKnex("tron");
+  const knex = await getKnex(database);
   const [, , load = true] = process.argv;
 
   if (load) {
@@ -119,6 +117,7 @@ const start = async () => {
 
       if (_.isEmpty(accounts)) {
         next = false;
+        logger.info("finished updating accounts");
         break;
       } else {
         // eslint-disable-next-line no-plusplus

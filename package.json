@@ -1,5 +1,5 @@
 {
-  "name": "gas-mirror",
+  "name": "eth-history",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -13,8 +13,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/jest": "^27.4.1",
+    "@types/jest": "^29.0.3",
     "@types/lodash": "^4.14.180",
+    "@types/node": "^18.7.18",
     "@types/node-fetch": "^2.6.1",
     "@types/triple-beam": "^1.3.2",
     "@types/uuid": "^8.3.4",
@@ -43,6 +44,7 @@
     "winston": "^3.6.0"
   },
   "devDependencies": {
+    "dotenv": "^16.0.2",
     "ts-jest": "^27.1.3"
   }
 }

@@ -28,7 +28,8 @@
 		"noUnusedParameters": true,
 		"noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true,
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"types": ["node", "jest"]
 	},
 	"include": [
 		"**/*.ts",
@@ -36,5 +37,5 @@
 	],
 	"exclude": [
 		"node_modules"
-	]
+	],
 }
