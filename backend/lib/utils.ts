@@ -13,6 +13,7 @@ export const parseCsv: (csv: string) => string[][] = _.flow([
   (data) => _.split(data, "\n"),
   (data) => _.drop(data, 1),
   (data) => _.map(data, (data) => _.split(data, ",")),
+  (data) => _.filter(data, (data) => _.negate(_.isEqual)(data, [""])), // filter out empty rows
 ]);
 
 export const logger = winston.createLogger({
